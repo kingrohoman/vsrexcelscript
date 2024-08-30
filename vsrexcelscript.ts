@@ -144,21 +144,39 @@ function main(workbook: ExcelScript.Workbook) {
     sheet.getRange("L1").setValue("Country of Origin Long");
     sheet.getRange("M1").setValue("Tariff");
 
-    // Apply VLOOKUP formula to each cell in the new column
-    for (let i = 2; i <= lastRow + 1; i++) {
-      let cellAddress = `L${i}`;
-      let lookupCell = `K${i}`;
-      let formula = `=VLOOKUP(${lookupCell}, COO!A:B, 2, FALSE)`;
-      sheet.getRange(cellAddress).setFormula(formula);
+  // Apply VLOOKUP formula to each cell in the new column
+  for (let i = 2; i <= lastRow + 1; i++) {
+    let cellAddress = `L${i}`;
+    let lookupCell = `K${i}`;
+    let formula = `=VLOOKUP(${lookupCell}, COO!A:B, 2, FALSE)`;
+    sheet.getRange(cellAddress).setFormula(formula);
+  }
+
+  // Set specific values for M2, AC2, AD2, and AE2 down to the last row
+  for (let i = 2; i <= lastRow + 1; i++) {
+    sheet.getRange(`M${i}`).setValue("9825.10.0000");
+    sheet.getRange(`AC${i}`).setValue("POUND");
+    sheet.getRange(`AD${i}`).setValue(1);
+    sheet.getRange(`AE${i}`).setValue(1);
+  }
+
+  // UPDATE MANCOLOR VALUES
+  
+    // Replacing - with / and converting to proper case in column N
+    let columnN = sheet.getRange(`N2:N${lastRow + 1}`);
+    let columnNValues = columnN.getValues();
+
+    for (let i = 0; i < columnNValues.length; i++) {
+      columnNValues[i][0] = toProperCase(columnNValues[i][0].replace(/-/g, '/'));
     }
 
-    // Set specific values for M2, AC2, AD2, and AE2 down to the last row
-    for (let i = 2; i <= lastRow + 1; i++) {
-      sheet.getRange(`M${i}`).setValue("9825.10.0000");
-      sheet.getRange(`AC${i}`).setValue("POUND");
-      sheet.getRange(`AD${i}`).setValue(1);
-      sheet.getRange(`AE${i}`).setValue(1);
+    // Proper Title for Mancolor
+
+    for (let i = 0; i < columnNValues.length; i++) {
+      columnNValues[i][0] = toProperCase(columnNValues[i][0]);
     }
+
+    columnN.setValues(columnNValues);
 
 }
 
