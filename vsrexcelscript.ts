@@ -32,4 +32,18 @@ function main(workbook: ExcelScript.Workbook) {
   // Get the range for Column A based on the used range
   let columnARange = sheet.getRangeByIndexes(0, 0, totalRows, 1);
   columnARange.removeDuplicates([0], true);
+
+  //ADD PSKU COLUMNS AND DUPLICATE VALUES
+    //Insert range B:F on sheet, move existing cells to the right
+    sheet.getRange("B:F").insert(ExcelScript.InsertShiftDirection.right);
+
+    //Paste Column A to Range B:F
+    sheet.getRange("B:F").copyFrom(sheet.getRange("A:A"), ExcelScript.RangeCopyType.all, false, false);
+
+    //Rename the Headers
+    sheet.getRange("B1").setValue("Inventory CD");
+    sheet.getRange("C1").setValue("SKU");
+    sheet.getRange("D1").setValue("PSKU");
+    sheet.getRange("E1").setValue("Parent SKU");
+    sheet.getRange("F1").setValue("Parent SKUID");
 }
