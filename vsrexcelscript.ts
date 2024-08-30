@@ -119,4 +119,38 @@ function main(workbook: ExcelScript.Workbook) {
   }
 
   genderColumn.setValues(genderValues);
+
+  //CHANGE TITLE VALUES TO PROPER CASE
+    let columnJ = sheet.getRange(`J2:J${lastRow + 1}`);
+    let columnJValues = columnJ.getValues();
+
+    for (let i = 0; i < columnJValues.length; i++) {
+      columnJValues[i][0] = toProperCase(columnJValues[i][0]);
+    }
+
+    columnJ.setValues(columnJValues);
+
+    // Function to convert a string to proper case
+    function toProperCase(str: string): string {
+      return str
+        .toLowerCase()
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+
+  //UPDATING COUNTRY OF ORIGIN VALUES
+    //Create and Rename Columns
+    sheet.getRange("L:L").insert(ExcelScript.InsertShiftDirection.right);
+    sheet.getRange("L:L").insert(ExcelScript.InsertShiftDirection.right);
+    sheet.getRange("L1").setValue("Country of Origin Long");
+    sheet.getRange("M1").setValue("Tariff");
+
+    // Apply VLOOKUP formula to each cell in the new column
+    for (let i = 2; i <= lastRow + 1; i++) {
+      let cellAddress = `L${i}`;
+      let lookupCell = `K${i}`;
+      let formula = `=VLOOKUP(${lookupCell}, COO!A:B, 2, FALSE)`;
+      sheet.getRange(cellAddress).setFormula(formula);
+    }
+
 }
+
