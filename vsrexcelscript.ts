@@ -28,22 +28,37 @@ function main(workbook: ExcelScript.Workbook) {
   sheet.getRange("Q:U").delete(ExcelScript.DeleteShiftDirection.left);
   sheet.getRange("V:W").delete(ExcelScript.DeleteShiftDirection.left);
 
-  // REMOVE DUPLICATES BASED ON VALUES IN COLUMN A
-  // Get the range for Column A based on the used range
-  let columnARange = sheet.getRangeByIndexes(0, 0, totalRows, 1);
-  columnARange.removeDuplicates([0], true);
+  // DELETING DUPLICATES IN COLUMN A
+  // Find the last row in column A
+  let lastRow = sheet.getRange("A:A").find("*", { searchDirection: ExcelScript.SearchDirection.backwards }).getRowIndex();
+
+  // Remove duplicates in Column A
+  let columnAValues = sheet.getRange(`A2:A${lastRow + 1}`).getValues();
+  let uniqueValues = new Set();
+
+  for (let i = columnAValues.length - 1; i >= 0; i--) {
+    if (uniqueValues.has(columnAValues[i][0])) {
+      sheet.getRange(`A${i + 2}`).getEntireRow().delete(ExcelScript.DeleteShiftDirection.up);
+    } else {
+      uniqueValues.add(columnAValues[i][0]);
+    }
+  }
+
+  // Update the last row after deleting duplicates
+  lastRow = sheet.getRange("A:A").find("*", { searchDirection: ExcelScript.SearchDirection.backwards }).getRowIndex();
+
 
   //ADD PSKU COLUMNS AND DUPLICATE VALUES
-    //Insert range B:F on sheet, move existing cells to the right
-    sheet.getRange("B:F").insert(ExcelScript.InsertShiftDirection.right);
+  //Insert range B:F on sheet, move existing cells to the right
+  sheet.getRange("B:F").insert(ExcelScript.InsertShiftDirection.right);
 
-    //Paste Column A to Range B:F
-    sheet.getRange("B:F").copyFrom(sheet.getRange("A:A"), ExcelScript.RangeCopyType.all, false, false);
+  //Paste Column A to Range B:F
+  sheet.getRange("B:F").copyFrom(sheet.getRange("A:A"), ExcelScript.RangeCopyType.all, false, false);
 
-    //Rename the Headers
-    sheet.getRange("B1").setValue("Inventory CD");
-    sheet.getRange("C1").setValue("SKU");
-    sheet.getRange("D1").setValue("PSKU");
-    sheet.getRange("E1").setValue("Parent SKU");
-    sheet.getRange("F1").setValue("Parent SKUID");
+  //Rename the Headers
+  sheet.getRange("B1").setValue("Inventory CD");
+  sheet.getRange("C1").setValue("SKU");
+  sheet.getRange("D1").setValue("PSKU");
+  sheet.getRange("E1").setValue("Parent SKU");
+  sheet.getRange("F1").setValue("Parent SKUID");
 }
