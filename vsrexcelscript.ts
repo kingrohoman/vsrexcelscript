@@ -61,4 +61,18 @@ function main(workbook: ExcelScript.Workbook) {
   sheet.getRange("D1").setValue("PSKU");
   sheet.getRange("E1").setValue("Parent SKU");
   sheet.getRange("F1").setValue("Parent SKUID");
+
+  //UPDATE AGE VALUES
+  let ageColumn = sheet.getRange(`I1:I${lastRow}`);
+  let ageValues = ageColumn.getValues();
+
+  for (let i = 0; i < ageValues.length; i++) {
+    if (ageValues[i][0] === "Adults" || ageValues[i][0] === "All Ages" || ageValues[i][0] === "Youth + Adults") {
+      ageValues[i][0] = "Adult"
+    } else if (ageValues[i][0] === "Pre-School") {
+      ageValues[i][0] = "Toddler";
+    }
+  }
+
+  ageColumn.setValues(ageValues);
 }
