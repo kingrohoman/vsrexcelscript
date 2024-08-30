@@ -152,5 +152,13 @@ function main(workbook: ExcelScript.Workbook) {
       sheet.getRange(cellAddress).setFormula(formula);
     }
 
+    // Set specific values for M2, AC2, AD2, and AE2 down to the last row
+    for (let i = 2; i <= lastRow + 1; i++) {
+      sheet.getRange(`M${i}`).setValue("9825.10.0000");
+      sheet.getRange(`AC${i}`).setValue("POUND");
+      sheet.getRange(`AD${i}`).setValue(1);
+      sheet.getRange(`AE${i}`).setValue(1);
+    }
+
 }
 
