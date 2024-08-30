@@ -1,11 +1,23 @@
 function main(workbook: ExcelScript.Workbook) {
-  // DELETING THE LAST 3 ROWS
   // Get the active worksheet
   let sheet = workbook.getActiveWorksheet();
 
   // Get the used range of the sheet
   let usedRange = sheet.getUsedRange();
+  let usedValues = usedRange.getValues() as string[][];
 
+  // Remove ® and ™ from the entire range
+  for (let i = 0; i < usedValues.length; i++) {
+    for (let j = 0; j < usedValues[i].length; j++) {
+      if (typeof usedValues[i][j] === 'string') {
+        usedValues[i][j] = usedValues[i][j].replace(/®|™/g, '');
+      }
+    }
+  }
+
+  usedRange.setValues(usedValues);
+
+  // DELETING THE LAST 3 ROWS
   // Get the total number of rows in the used range
   let totalRows = usedRange.getRowCount();
 
@@ -121,28 +133,28 @@ function main(workbook: ExcelScript.Workbook) {
   genderColumn.setValues(genderValues);
 
   //CHANGE TITLE VALUES TO PROPER CASE
-    let columnJ = sheet.getRange(`J2:J${lastRow + 1}`);
-    let columnJValues = columnJ.getValues();
+  let columnJ = sheet.getRange(`J2:J${lastRow + 1}`);
+  let columnJValues = columnJ.getValues();
 
-    for (let i = 0; i < columnJValues.length; i++) {
-      columnJValues[i][0] = toProperCase(columnJValues[i][0]);
-    }
+  for (let i = 0; i < columnJValues.length; i++) {
+    columnJValues[i][0] = toProperCase(columnJValues[i][0]);
+  }
 
-    columnJ.setValues(columnJValues);
+  columnJ.setValues(columnJValues);
 
-    // Function to convert a string to proper case
-    function toProperCase(str: string): string {
-      return str
-        .toLowerCase()
-        .replace(/\b\w/g, (char) => char.toUpperCase());
-    }
+  // Function to convert a string to proper case
+  function toProperCase(str: string): string {
+    return str
+      .toLowerCase()
+      .replace(/\b\w/g, (char) => char.toUpperCase());
+  }
 
   //UPDATING COUNTRY OF ORIGIN VALUES
-    //Create and Rename Columns
-    sheet.getRange("L:L").insert(ExcelScript.InsertShiftDirection.right);
-    sheet.getRange("L:L").insert(ExcelScript.InsertShiftDirection.right);
-    sheet.getRange("L1").setValue("Country of Origin Long");
-    sheet.getRange("M1").setValue("Tariff");
+  //Create and Rename Columns
+  sheet.getRange("L:L").insert(ExcelScript.InsertShiftDirection.right);
+  sheet.getRange("L:L").insert(ExcelScript.InsertShiftDirection.right);
+  sheet.getRange("L1").setValue("Country of Origin Long");
+  sheet.getRange("M1").setValue("Tariff");
 
   // Apply VLOOKUP formula to each cell in the new column
   for (let i = 2; i <= lastRow + 1; i++) {
@@ -161,22 +173,15 @@ function main(workbook: ExcelScript.Workbook) {
   }
 
   // UPDATE MANCOLOR VALUES
-  
-    // Replacing - with / and converting to proper case in column N
-    let columnN = sheet.getRange(`N2:N${lastRow + 1}`);
-    let columnNValues = columnN.getValues();
+  // Replacing - with / and converting to proper case in column N
+  let columnN = sheet.getRange(`N2:N${lastRow + 1}`);
+  let columnNValues = columnN.getValues();
 
-    for (let i = 0; i < columnNValues.length; i++) {
-      columnNValues[i][0] = toProperCase(columnNValues[i][0].replace(/-/g, '/'));
-    }
+  for (let i = 0; i < columnNValues.length; i++) {
+    columnNValues[i][0] = toProperCase(columnNValues[i][0].replace(/-/g, '/'));
+  }
 
-    // Proper Title for Mancolor
-
-    for (let i = 0; i < columnNValues.length; i++) {
-      columnNValues[i][0] = toProperCase(columnNValues[i][0]);
-    }
-
-    columnN.setValues(columnNValues);
+  columnN.setValues(columnNValues);
 
   // UPDATE COLOR VALUES
   let columnV = sheet.getRange(`V2:V${lastRow + 1}`);
@@ -190,7 +195,7 @@ function main(workbook: ExcelScript.Workbook) {
 
   columnV.setValues(columnVValues);
 
-  // UPDATE PATTER2 VALUES
+  // UPDATE PATTERN VALUES
   let columnX = sheet.getRange(`X2:X${lastRow + 1}`);
   let columnXValues = columnX.getValues();
 
@@ -207,5 +212,59 @@ function main(workbook: ExcelScript.Workbook) {
   }
 
   columnX.setValues(columnXValues);
-}
 
+  //UPDATE MATERIAL VALUES
+  // List of materials to match
+  const materials = [
+    "Acrylic",
+    "Canvas",
+    "Cotton",
+    "Leather",
+    "Mesh",
+    "Synthetic",
+    "Nylon",
+    "Suede",
+    "Textile",
+    "Wool"
+  ];
+
+  // Search for "upper" in Details (column R) and update column Q if empty
+  let detail1Column = sheet.getRange(`R2:R${lastRow + 1}`);
+  let detail1Values = detail1Column.getValues();
+  let columnQ = sheet.getRange(`Q2:Q${lastRow + 1}`);
+  let columnQValues = columnQ.getValues();
+
+  for (let i = 0; i < detail1Values.length; i++) {
+    let detail: string = detail1Values[i][0].toLowerCase();
+    if (detail.includes("upper") && !columnQValues[i][0]) {
+      let words: string[] = detail.split(" ");
+      let matches: string[] = words.filter(word => materials.includes(word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()));
+      if (matches.length === 1) {
+        columnQValues[i][0] = matches[0];
+      } else if (matches.length > 1) {
+        columnQValues[i][0] = words[0];
+      }
+    }
+  }
+
+  // Search for the word after "100%" in column P and update column Q if empty
+  let columnP: ExcelScript.Range = sheet.getRange(`P2:P${lastRow + 1}`);
+  let columnPValues: string[][] = columnP.getValues() as string[][];
+  const materialsAfter100: string[] = ["cotton", "polyester", "nylon"];
+
+  for (let i = 0; i < columnPValues.length; i++) {
+    let detail: string = columnPValues[i][0].toLowerCase();
+    if (detail.includes("100%") && !columnQValues[i][0]) {
+      let words: string[] = detail.split(" ");
+      let index = words.indexOf("100%");
+      if (index !== -1 && index + 1 < words.length) {
+        let nextWord: string = words[index + 1].toLowerCase();
+        if (materialsAfter100.includes(nextWord)) {
+          columnQValues[i][0] = nextWord.charAt(0).toUpperCase() + nextWord.slice(1);
+        }
+      }
+    }
+  }
+
+  columnQ.setValues(columnQValues);
+}
