@@ -189,5 +189,23 @@ function main(workbook: ExcelScript.Workbook) {
   }
 
   columnV.setValues(columnVValues);
+
+  // UPDATE PATTER2 VALUES
+  let columnX = sheet.getRange(`X2:X${lastRow + 1}`);
+  let columnXValues = columnX.getValues();
+
+  for (let i = 0; i < columnXValues.length; i++) {
+    columnXValues[i][0] = columnXValues[i][0]
+      .replace(/Plain/gi, 'Logo')
+      .replace(/Color Blocking/gi, 'Logo')
+      .replace(/Color Gradient/gi, 'Gradient')
+      .replace(/Checked/gi, 'Plaid')
+      .replace(/Other Pattern/gi, 'Graphic')
+      .replace(/Print/gi, 'Graphic')
+      .replace(/Animal Graphic/gi, 'Animal Print')
+      .replace(/Logo Graphic/gi, 'Logo');
+  }
+
+  columnX.setValues(columnXValues);
 }
 
