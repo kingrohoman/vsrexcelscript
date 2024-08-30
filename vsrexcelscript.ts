@@ -178,5 +178,16 @@ function main(workbook: ExcelScript.Workbook) {
 
     columnN.setValues(columnNValues);
 
+  // UPDATE COLOR VALUES
+  let columnV = sheet.getRange(`V2:V${lastRow + 1}`);
+  let columnVValues = columnV.getValues();
+
+  for (let i = 0; i < columnVValues.length; i++) {
+    columnVValues[i][0] = columnVValues[i][0]
+      .replace(/gray/gi, 'grey')
+      .replace(/assorted colours/gi, 'multi');
+  }
+
+  columnV.setValues(columnVValues);
 }
 
