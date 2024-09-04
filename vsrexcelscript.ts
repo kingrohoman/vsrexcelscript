@@ -267,4 +267,24 @@ function main(workbook: ExcelScript.Workbook) {
   }
 
   columnQ.setValues(columnQValues);
+
+  // UPDATE FABRIC VALUES
+  for (let i = 2; i <= lastRow + 1; i++) {
+    let cellAddress = `AG${i}`;
+    let lookupCell = `P${i}`;
+    let formula = `=VLOOKUP(${lookupCell}, FAB!A:B, 2, FALSE)`;
+    sheet.getRange(cellAddress).setFormula(formula);
+  }
+
+  columnQ.setValues(columnQValues);
+
+  //COPY PRICE TO MSRP
+
+    // Copy all values from column W to column AF
+    let columnW: ExcelScript.Range = sheet.getRange(`W2:W${lastRow + 1}`);
+    let columnWValues: string[][] = columnW.getValues() as string[][];
+    let columnAF: ExcelScript.Range = sheet.getRange(`AF2:AF${lastRow + 1}`);
+    columnAF.setValues(columnWValues);
+
+    columnQ.setValues(columnQValues);
 }
